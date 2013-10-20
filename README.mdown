@@ -1,0 +1,54 @@
+JCMenu
+===========
+
+JCMenu is an expanded menu.
+
+Installation
+============
+
+* Add `JBMenu` folder in your project
+* Import `JCMenuItem.h` `JCMenu.h` 
+* Use it !
+
+Use
+===
+
+Add items : 
+
+``` objective-c
+JCMenuItem *item1 = [[JCMenuItem alloc] initWithImage:image action:^(JCMenuItem *item){
+        NSLog(@"Item 1");
+    }];
+```
+
+Create menu : 
+
+``` objective-c
+JCMenu *menu = [[JCMenu alloc] initWithFrame:frame items:@[item1, item2]];
+    }];
+[self.view addSubview:menu];
+```
+
+Appearance
+==========
+
+``` objective-c
+@property(nonatomic, strong)   UIColor        *menuTintColor;       
+@property(nonatomic, assign)   BOOL            showSeparatorView;   
+@property(nonatomic, strong)   UIColor        *separatorColor;      
+@property(nonatomic)           CGFloat         separatorViewWidth;  
+@property(nonatomic)           CGFloat         separatorViewHeight;
+```
+
+TODO
+=====
+
+* More customization
+* Different menu position
+* Higlight work
+* ...
+
+Contact
+=======
+
+jeanbaptiste.castro@gmail.com
