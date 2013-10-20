@@ -48,7 +48,7 @@ TODO
 
 * More customization
 * Different menu position
-* Higlight work
+* Highlight work
 * ...
 
 Contact
