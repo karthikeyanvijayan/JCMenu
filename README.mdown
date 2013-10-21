@@ -8,7 +8,7 @@ JCMenu is an expanded menu.
 Installation
 ============
 
-* Add `JBMenu` folder in your project
+* Add `JCMenu` folder in your project
 * Import `JCMenuItem.h` `JCMenu.h` 
 * Use it !
 
