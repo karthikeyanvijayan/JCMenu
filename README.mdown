@@ -3,7 +3,7 @@ JCMenu
 
 JCMenu is an expanded menu.
 
-![Screenshot](https://github.com/jbaptistecastro/JCMenu/blob/master/Screenshot/jcmenu.gif)
+![Screenshot](https://github.com/jbaptistecastro/JCMenu/blob/master/jcmenu.gif)
 
 Installation
 ============
