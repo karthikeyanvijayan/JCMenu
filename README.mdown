@@ -27,7 +27,7 @@ Create menu :
 
 ``` objective-c
 JCMenu *menu = [[JCMenu alloc] initWithFrame:frame items:@[item1, item2]];
-    }];
+
 [self.view addSubview:menu];
 ```
 

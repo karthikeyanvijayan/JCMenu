@@ -122,7 +122,6 @@
                     [self setFrame:[self __updateFrame]];
                     [layer setOpacity:1];
                     [layer setFrame:[self __updateItemRectFromFrame:layer.frame index:index]];
-                } completion:^(BOOL finished){
                 }];
             }
         }];
