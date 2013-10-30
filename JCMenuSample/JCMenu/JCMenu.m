@@ -37,12 +37,13 @@
 @property(nonatomic, assign) BOOL            expand;
 
 @property(nonatomic, copy)   NSMutableArray *layerArray;        // Contain layer items. Use for rect management.
-@property(nonatomic, copy)   NSMutableArray *separatorArray;    // Contain separator. Use for rect management.
 
 @property(nonatomic)         CGFloat         originX;
 @property(nonatomic)         CGFloat         originY;
 @property(nonatomic)         CGFloat         segmentWidth;
 @property(nonatomic)         CGFloat         menuHeight;
+
+@property(nonatomic, assign) NSInteger       index;
 
 - (void)__setupMenu;
 
@@ -51,7 +52,6 @@
  */
 - (CGRect)__updateFrame;                                                    // Menu frame.
 - (CGRect)__updateItemRectFromFrame:(CGRect)frame index:(NSInteger)index;   // Item frame.
-- (CGRect)__updateSeparatorFrameWithIndex:(NSInteger)index;                 // Separator frame.
 
 @end
 
@@ -91,63 +91,39 @@
     self.expand = NO;
     
     self.menuTintColor = [UIColor blackColor];
-    self.showSeparatorView = NO;
-    self.separatorColor = [UIColor whiteColor];
-    self.separatorViewWidth = 2;
-    self.separatorViewHeight = self.frame.size.height;
 }
 
 #pragma mark - Draw
 
 - (void)drawRect:(CGRect)rect
 {
+    // Update unselected layer
+    
     if (_expand) {
         [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
-            JCMenuItem *menuItem = item;
             CALayer *layer = [self.layerArray objectAtIndex:index];
             
-            if (_showSeparatorView) {
-                if (index != 0 && index != [self.items count]) {
-                    UIView *separatorView = [self.separatorArray objectAtIndex:index];
-                    [separatorView setBackgroundColor:self.separatorColor];
-                    [separatorView setFrame:[self __updateSeparatorFrameWithIndex:index]];
-                    [separatorView setAlpha:1];
-                }
-            }
-            
-            if (menuItem != self.selectedItem)
+            if (index != self.index)
                 [layer setOpacity:0.5];
-            else {
-                [UIView animateWithDuration:.2 animations:^{
-                    [self setFrame:[self __updateFrame]];
-                    [layer setOpacity:1];
-                    [layer setFrame:[self __updateItemRectFromFrame:layer.frame index:index]];
-                }];
-            }
         }];
     } else {
         [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
-            JCMenuItem *menuItem = item;
             CALayer *layer = [self.layerArray objectAtIndex:index];
             
-            if (_showSeparatorView) {
-                if (index != 0 && index != [self.items count]) {
-                    UIView *separatorView = [self.separatorArray objectAtIndex:index];
-                    [separatorView setAlpha:0];
-                }
-            }
-            
-            if (menuItem != self.selectedItem)
+            if (index != self.index)
                 [layer setOpacity:0];
-            else {
-                [UIView animateWithDuration:0.2 animations:^{
-                    [layer setOpacity:1];
-                    [self setFrame:[self __updateFrame]];
-                    [layer setFrame:[self __updateItemRectFromFrame:layer.frame index:index]];
-                }];
-            }
         }];
     }
+    
+    // Update selected layer + frame
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        CALayer *selectedLayer = [self.layerArray objectAtIndex:self.index];
+        [selectedLayer setFrame:[self __updateItemRectFromFrame:selectedLayer.frame index:self.index]];
+        [selectedLayer setOpacity:1];
+        
+        [self setFrame:[self __updateFrame]];
+    }];
 }
 
 /*
@@ -194,11 +170,6 @@
     return CGRectZero;
 }
 
-- (CGRect)__updateSeparatorFrameWithIndex:(NSInteger)index
-{
-    return CGRectMake(self.segmentWidth * index - (self.separatorViewWidth / 2), (self.menuHeight / 2) - (self.separatorViewHeight / 2), self.separatorViewWidth, self.separatorViewHeight);
-}
-
 #pragma mark - Touch method
 
 /*
@@ -212,9 +183,9 @@
     
     if (CGRectContainsPoint(self.bounds, touchLocation)) {
         if (self.expand) {
-            NSInteger index = touchLocation.x / (self.frame.size.width / [self.items count]);
+            self.index = touchLocation.x / (self.frame.size.width / [self.items count]);
             
-            [self setSelectedItem:[self.items objectAtIndex:index]];
+            [self setSelectedItem:[self.items objectAtIndex:self.index]];
         } else {
             [self setExpand:YES];
         }
@@ -266,6 +237,7 @@
     _selectedItem = selectedItem;
     
     // Item action
+    
     if (_selectedItem.action) {
         _selectedItem.action(_selectedItem);
     }
@@ -288,56 +260,6 @@
         _menuTintColor = menuTintColor;
         
         [self setBackgroundColor:_menuTintColor];
-    }
-}
-
-- (void)setShowSeparatorView:(BOOL)showSeparatorView
-{
-    if (_showSeparatorView != showSeparatorView) {
-        _showSeparatorView = showSeparatorView;
-        
-        if (_showSeparatorView) {
-            NSMutableArray *separatorA = [[NSMutableArray alloc] initWithCapacity:[self.items count]];
-            
-            [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
-                UIView *separatorView = [[UIView alloc] init];
-                [separatorView setAlpha:0];
-                [self addSubview:separatorView];
-                
-                [separatorA addObject:separatorView];
-            }];
-            
-            self.separatorArray = separatorA;
-        }
-        
-        [self setNeedsDisplay];
-    }
-}
-
-- (void)setSeparatorColor:(UIColor *)separatorColor
-{
-    if (_separatorColor != separatorColor) {
-        _separatorColor = separatorColor;
-        
-        [self setNeedsDisplay];
-    }
-}
-
-- (void)setSeparatorViewWidth:(CGFloat)separatorViewWidth
-{
-    if (_separatorViewWidth != separatorViewWidth) {
-        _separatorViewWidth = separatorViewWidth;
-        
-        [self setNeedsDisplay];
-    }
-}
-
-- (void)setSeparatorViewHeight:(CGFloat)separatorViewHeight
-{
-    if (_separatorViewHeight != separatorViewHeight) {
-        _separatorViewHeight = separatorViewHeight;
-        
-        [self setNeedsDisplay];
     }
 }
 

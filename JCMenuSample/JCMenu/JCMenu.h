@@ -41,9 +41,5 @@
 // Appearance
 
 @property(nonatomic, strong)   UIColor        *menuTintColor;       // By default blackColor.
-@property(nonatomic, assign)   BOOL            showSeparatorView;   // By default NO.
-@property(nonatomic, strong)   UIColor        *separatorColor;      // By default whiteColor.
-@property(nonatomic)           CGFloat         separatorViewWidth;  // By default 2px.
-@property(nonatomic)           CGFloat         separatorViewHeight; // By default menu height. Must be lower than menu height.
 
 @end

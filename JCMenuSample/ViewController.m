@@ -39,10 +39,6 @@
     JCMenu *menu = [[JCMenu alloc] initWithFrame:CGRectMake(10, self.view.frame.size.height - 60, self.view.frame.size.width - 20, 50) items:@[facebook, tumblr, yahoo, youtube]];
     [menu setSelectedItem:facebook];
     [menu setMenuTintColor:[UIColor colorWithRed:189/255.0f green:22/255.0f blue:34/255.0f alpha:1.0f]];
-    [menu setShowSeparatorView:YES];
-    [menu setSeparatorColor:[UIColor whiteColor]];
-    [menu setSeparatorViewHeight:20];
-    [menu setSeparatorViewWidth:1];
     [self.view addSubview:menu];
 }
 
