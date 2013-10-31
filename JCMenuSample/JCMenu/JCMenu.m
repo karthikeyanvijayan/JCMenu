@@ -99,23 +99,16 @@
 {
     // Update unselected layer
     
-    if (_expand) {
-        [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
-            CALayer *layer = [self.layerArray objectAtIndex:index];
-            
-            if (index != self.index)
-                [layer setOpacity:0.5];
-        }];
-    } else {
-        [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
-            CALayer *layer = [self.layerArray objectAtIndex:index];
-            
-            if (index != self.index)
-                [layer setOpacity:0];
-        }];
-    }
+    [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
+        CALayer *layer = [self.layerArray objectAtIndex:index];
+        
+        if (index != self.index) {
+            _expand ? [layer setOpacity:0.5] : [layer setOpacity:0];
+        }
+        
+    }];
     
-    // Update selected layer + frame
+    // Update selected layer + menu frame
     
     [UIView animateWithDuration:0.2 animations:^{
         CALayer *selectedLayer = [self.layerArray objectAtIndex:self.index];
