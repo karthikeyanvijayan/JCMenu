@@ -85,10 +85,10 @@
 
 - (void)__setupMenu
 {
-    self.originX = self.frame.origin.x;
-    self.originY = self.frame.origin.y;
+    self.originX       = self.frame.origin.x;
+    self.originY       = self.frame.origin.y;
     
-    self.expand = NO;
+    self.expand        = NO;
     
     self.menuTintColor = [UIColor blackColor];
 }
@@ -142,7 +142,7 @@
         CGFloat imageWidth = frame.size.width;
         CGFloat imageHeight = frame.size.height;
         
-        CGFloat x = self.segmentWidth * index + (self.segmentWidth - imageWidth)/2.0f;
+        CGFloat x = self.segmentWidth * index + (self.segmentWidth - imageWidth) / 2;
         CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
         
         CGRect rect = CGRectMake(x, y, imageWidth, imageHeight);
@@ -152,7 +152,7 @@
         CGFloat imageWidth = frame.size.width;
         CGFloat imageHeight = frame.size.height;
         
-        CGFloat x = (self.segmentWidth - imageWidth)/2.0f;
+        CGFloat x = (self.segmentWidth - imageWidth) / 2;
         CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
         
         CGRect rect = CGRectMake(x, y, imageWidth, imageHeight);
@@ -201,17 +201,17 @@
         
         [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
             JCMenuItem *menuItem = item;
-            UIImage *icon = menuItem.image;
-            CGFloat imageWidth = icon.size.width;
-            CGFloat imageHeight = icon.size.height;
+            UIImage *image = menuItem.image;
+            CGFloat imageWidth = image.size.width;
+            CGFloat imageHeight = image.size.height;
             
-            CGFloat x = self.segmentWidth * index + (self.segmentWidth - imageWidth)/2.0f;
+            CGFloat x = self.segmentWidth * index + (self.segmentWidth - imageWidth) / 2;
             CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
             
             CGRect rect = CGRectMake(x, y, imageWidth, imageHeight);
             
             CALayer *imageLayer = [CALayer layer];
-            imageLayer.contents = (id)icon.CGImage;
+            imageLayer.contents = (id)image.CGImage;
             [imageLayer setFrame:rect];
             [imageLayer setOpacity:0];
             [self.layer addSublayer:imageLayer];
