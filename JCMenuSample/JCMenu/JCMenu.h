@@ -35,11 +35,11 @@
 
 - (id)initWithFrame:(CGRect)frame items:(NSArray*)items;
 
-@property(nonatomic, copy)     NSArray        *items;               // get/set visible JCMenuItem. Default is nil. Must contain object of type JCMenuItem
-@property(nonatomic, assign)   JCMenuItem     *selectedItem;         
+@property(nonatomic, copy)     NSArray *items;               // get/set visible JCMenuItem. Default is nil. Must contain object of type JCMenuItem
+@property(nonatomic, assign)   JCMenuItem *selectedItem;
 
 // Appearance
 
-@property(nonatomic, strong)   UIColor        *menuTintColor;       // By default blackColor.
+@property(nonatomic, strong)   UIColor *menuTintColor;       // By default blackColor.
 
 @end

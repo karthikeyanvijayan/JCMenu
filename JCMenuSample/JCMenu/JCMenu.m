@@ -34,18 +34,19 @@
 
 @interface JCMenu (/* Private */)
 
-@property(nonatomic, assign) BOOL            expand;
+@property(nonatomic, assign, getter = isExpand) BOOL expand;
 
-@property(nonatomic, copy)   NSMutableArray *layerArray;        // Contain layer items. Use for rect management.
+@property(nonatomic, copy)   NSMutableArray *layerArray;                   // Contain layer items. Use for rect management.
 
-@property(nonatomic)         CGFloat         originX;
-@property(nonatomic)         CGFloat         originY;
-@property(nonatomic)         CGFloat         segmentWidth;
-@property(nonatomic)         CGFloat         menuHeight;
+@property(nonatomic)         CGFloat originX;
+@property(nonatomic)         CGFloat originY;
+@property(nonatomic)         CGFloat segmentWidth;
+@property(nonatomic)         CGFloat menuHeight;
 
-@property(nonatomic, assign) NSInteger       index;
+@property(nonatomic, assign) NSInteger index;
 
 - (void)__setupMenu;
+- (void)__buildMenu;
 
 /*
  Rect management (menu expand/shrink)
@@ -85,12 +86,39 @@
 
 - (void)__setupMenu
 {
-    self.originX       = self.frame.origin.x;
-    self.originY       = self.frame.origin.y;
+    self.originX = self.frame.origin.x;
+    self.originY = self.frame.origin.y;
     
-    self.expand        = NO;
+    self.expand = NO;
     
     self.menuTintColor = [UIColor blackColor];
+}
+
+- (void)__buildMenu
+{
+    NSMutableArray *layerA = [[NSMutableArray alloc] initWithCapacity:[self.items count]];
+    
+    [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
+        JCMenuItem *menuItem = item;
+        UIImage *image = menuItem.image;
+        CGFloat imageWidth = image.size.width;
+        CGFloat imageHeight = image.size.height;
+        
+        CGFloat x = self.segmentWidth * index + (self.segmentWidth - imageWidth) / 2;
+        CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
+        
+        CGRect rect = CGRectMake(x, y, imageWidth, imageHeight);
+        
+        CALayer *imageLayer = [CALayer layer];
+        imageLayer.contents = (id)image.CGImage;
+        [imageLayer setFrame:rect];
+        [imageLayer setOpacity:0];
+        [self.layer addSublayer:imageLayer];
+        
+        [layerA addObject:imageLayer];
+    }];
+    
+    self.layerArray = layerA;
 }
 
 #pragma mark - Draw
@@ -103,7 +131,7 @@
         CALayer *layer = [self.layerArray objectAtIndex:index];
         
         if (index != self.index) {
-            _expand ? [layer setOpacity:0.5] : [layer setOpacity:0];
+            self.isExpand ? [layer setOpacity:0.5] : [layer setOpacity:0];
         }
         
     }];
@@ -127,40 +155,22 @@
 
 - (CGRect)__updateFrame
 {
-    if (_expand) {
-        return CGRectMake(self.originX, self.originY, self.frame.size.width * [self.items count], self.menuHeight);
-    } else {
-        return CGRectMake(self.originX, self.originY, self.frame.size.width / [self.items count], self.frame.size.height);
-    }
+    CGRect expandRect = CGRectMake(self.originX, self.originY, self.frame.size.width * [self.items count], self.menuHeight);
+    CGRect shrinkRect = CGRectMake(self.originX, self.originY, self.frame.size.width / [self.items count], self.frame.size.height);
     
-    return CGRectZero;
+    return self.isExpand ? expandRect : shrinkRect;
 }
 
 - (CGRect)__updateItemRectFromFrame:(CGRect)frame index:(NSInteger)index
 {
-    if (_expand) {
-        CGFloat imageWidth = frame.size.width;
-        CGFloat imageHeight = frame.size.height;
-        
-        CGFloat x = self.segmentWidth * index + (self.segmentWidth - imageWidth) / 2;
-        CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
-        
-        CGRect rect = CGRectMake(x, y, imageWidth, imageHeight);
-        
-        return rect;
-    } else {
-        CGFloat imageWidth = frame.size.width;
-        CGFloat imageHeight = frame.size.height;
-        
-        CGFloat x = (self.segmentWidth - imageWidth) / 2;
-        CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
-        
-        CGRect rect = CGRectMake(x, y, imageWidth, imageHeight);
-        
-        return rect;
-    }
+    CGFloat imageWidth = frame.size.width;
+    CGFloat imageHeight = frame.size.height;
+    CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
     
-    return CGRectZero;
+    CGRect itemExpandRect = CGRectMake(self.segmentWidth * index + (self.segmentWidth - imageWidth) / 2, y, imageWidth, imageHeight);
+    CGRect itemShrinkRect = CGRectMake((self.segmentWidth - imageWidth) / 2, y, imageWidth, imageWidth);
+    
+    return self.isExpand ? itemExpandRect : itemShrinkRect;
 }
 
 #pragma mark - Touch method
@@ -175,7 +185,7 @@
     CGPoint touchLocation = [touch locationInView:self];
     
     if (CGRectContainsPoint(self.bounds, touchLocation)) {
-        if (self.expand) {
+        if (self.isExpand) {
             self.index = touchLocation.x / (self.frame.size.width / [self.items count]);
             
             [self setSelectedItem:[self.items objectAtIndex:self.index]];
@@ -195,31 +205,8 @@
         self.segmentWidth = self.frame.size.width / [self.items count];
         self.menuHeight = self.frame.size.height;
         
-        [self __updateFrame];
-        
-        NSMutableArray *layerA = [[NSMutableArray alloc] initWithCapacity:[self.items count]];
-        
-        [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger index, BOOL *stop) {
-            JCMenuItem *menuItem = item;
-            UIImage *image = menuItem.image;
-            CGFloat imageWidth = image.size.width;
-            CGFloat imageHeight = image.size.height;
-            
-            CGFloat x = self.segmentWidth * index + (self.segmentWidth - imageWidth) / 2;
-            CGFloat y = (self.menuHeight / 2) - (imageHeight / 2);
-            
-            CGRect rect = CGRectMake(x, y, imageWidth, imageHeight);
-            
-            CALayer *imageLayer = [CALayer layer];
-            imageLayer.contents = (id)image.CGImage;
-            [imageLayer setFrame:rect];
-            [imageLayer setOpacity:0];
-            [self.layer addSublayer:imageLayer];
-            
-            [layerA addObject:imageLayer];
-        }];
-        
-        self.layerArray = layerA;
+        [self __updateFrame];   // Update menu frame
+        [self __buildMenu];     // Build menu with items
         
         [self setNeedsDisplay];
     }
